@@ -1,0 +1,20 @@
+#separator:tab
+#html:true
+#tags column:3
+Why does mosaic-web model domain enums (e.g. <code>JobStatus</code>) as string unions instead of TS enums?	They serialise cleanly over JSON, narrow nicely in <code>switch</code>, and TS rejects typos. Also: <code>tsconfig.app.json</code> sets <code>erasableSyntaxOnly: true</code>, which forbids <code>enum</code>.	stage1::ts-fundamentals
+What is a literal union type? Give a one-line example.	A type whose value must be one of a finite list of literals.<br><code>type BookStatus = 'want_to_read' | 'reading' | 'read';</code>	stage1::ts-fundamentals
+When do you use <code>interface</code> vs <code>type</code> in mosaic-web style?	<code>interface</code> for object shapes; <code>type</code> for unions and utilities.	stage1::ts-fundamentals
+What does TS give you on an exhaustive <code>switch</code> over a union?	A compile-time guarantee that every case is handled. Add a new variant to the union later and the switch stops compiling until you handle it — bugs caught before runtime.	stage1::ts-fundamentals
+What does <code>verbatimModuleSyntax: true</code> require for type imports?	Type-only imports must be marked.<br>Pure: <code>import type { Book } from '../types';</code><br>Mixed runtime + type: <code>import { fn, type Book } from '../types';</code>	stage1::ts-fundamentals
+What does <code>notes?: string</code> on an interface field mean?	The field is optional — its value may be <code>undefined</code>. TS forces you to handle the undefined case when reading it.	stage1::ts-fundamentals
+What is the difference between a <code>Book</code> and a <code>BookStatus</code>?	<code>Book</code> is an object with multiple fields. <code>BookStatus</code> is just one of three string literals. To get the status out of a book you read <code>book.status</code>.	stage1::ts-fundamentals
+What does "narrowing" mean in TS?	Inside a branch, TS proves a value has a more specific type than its declaration.<br><code>if (status === 'read') { /* status is literally 'read' here */ }</code>	stage1::ts-fundamentals
+What is a discriminated union?	A union of object types where each variant has a unique literal field (the "discriminant") that picks it out. Common for modelling things like API success/error responses.	stage1::ts-fundamentals
+What does <code>?.</code> (optional chaining) do?	Short-circuits to <code>undefined</code> if the left side is <code>null</code> or <code>undefined</code> instead of throwing.<br><code>user?.address?.city</code>	stage1::ts-fundamentals
+What does <code>??</code> (nullish coalescing) do?	Returns the right side only if the left is <code>null</code> or <code>undefined</code> — NOT for <code>0</code>, <code>''</code>, or <code>false</code>.<br><code>book.addedAt ?? 'never'</code>	stage1::ts-fundamentals
+You're filtering a list and one filter key may be <code>undefined</code> (and should be skipped when missing). What's the pattern?	Guard with <code>!== undefined</code> and short-circuit; don't compare against <code>undefined</code> directly.<br><code>filters.minPages !== undefined && book.pages < filters.minPages</code>	stage1::ts-fundamentals
+How do you do a case-insensitive substring match in TS?	<code>haystack.toLowerCase().includes(needle.toLowerCase())</code>	stage1::ts-fundamentals
+Does <code>Array.prototype.filter</code> mutate the original array?	No — it returns a new array. Safe for "must not mutate" requirements.	stage1::ts-fundamentals
+TS error: <em>"Argument of type 'Book' is not assignable to parameter of type 'BookStatus'."</em> Likely fix?	You're passing the whole object where a union value is expected. Pass the field: <code>statusLabel(book.status)</code>, not <code>statusLabel(book)</code>.	stage1::ts-fundamentals
+Use <code>==</code> or <code>===</code> in mosaic-web?	<code>===</code> (strict). ESLint will flag <code>==</code>.	stage1::ts-fundamentals
+What does the <code>|</code> in a TS type mean?	Union — the value can be ANY of the listed alternatives.<br><code>type X = 'a' | 'b'</code> means <code>X</code> is either the string <code>'a'</code> or <code>'b'</code>.	stage1::ts-fundamentals
