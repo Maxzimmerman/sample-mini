@@ -2,6 +2,7 @@ import { Chip } from '@mui/material';
 import type { JSX } from 'react';
 
 import type { BookStatus } from '../types';
+import statusLabel from '../utils/formatBook';
 
 interface BookStatusBadgeProps {
   status: BookStatus;
