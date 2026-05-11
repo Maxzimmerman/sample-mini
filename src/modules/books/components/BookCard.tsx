@@ -28,7 +28,7 @@ export function BookCard({ book }: BookCardProps): JSX.Element {
   //   - Build the layout described above.
   // Rename `_props` to `{ book }` once you use it.
   void Card; void CardContent; void Stack; void Typography;
-  <Card>
+  return <Card>
     <CardContent>
       <Typography variant="h6">{book.title}</Typography>
       <Typography variant="body2" sx={{ color: 'text.secondary' }}>{book.author}</Typography>
@@ -36,5 +36,6 @@ export function BookCard({ book }: BookCardProps): JSX.Element {
       <BookStatusBadge status={book.status}></BookStatusBadge>
     </CardContent>
   </Card>
-  throw new Error('Not implemented');
 }
+
+export default BookCard;

@@ -1,4 +1,6 @@
 import { Box, Container, Stack, Typography } from '@mui/material';
+import { SAMPLE_BOOKS } from '@books/types';
+import BookCard from '@books/components/BookCard';
 
 export function App() {
   return (
@@ -33,6 +35,12 @@ export function App() {
             <code> npm run test:unit:watch</code> to begin.
           </Typography>
         </Box>
+      </Stack>
+
+      <Stack spacing={2}>                                                                                                                                                                                     
+        {SAMPLE_BOOKS.map((book) => (                                                                                                                                                                       
+          <BookCard key={book.id} book={book} />
+        ))}                                                                                                                                                                                                   
       </Stack>
     </Container>
   );
