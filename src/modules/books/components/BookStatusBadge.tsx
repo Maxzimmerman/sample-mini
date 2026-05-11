@@ -1,8 +1,8 @@
-import { Chip } from '@mui/material';
+import { Chip, type ChipProps } from '@mui/material';
 import type { JSX } from 'react';
 
 import type { BookStatus } from '../types';
-import statusLabel from '../utils/formatBook';
+import { statusLabel } from '../utils/formatBook';
 
 interface BookStatusBadgeProps {
   status: BookStatus;
@@ -18,15 +18,18 @@ interface BookStatusBadgeProps {
  * - 'reading'      → 'primary'
  * - 'want_to_read' → 'default'
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function BookStatusBadge(_props: BookStatusBadgeProps): JSX.Element {
-  // TODO (exercise 1):
-  //   - Import `statusLabel` from '../utils/formatBook' and use it for the chip label.
-  //   - Pick the colour from the mapping above (a switch over `status` works well).
-  //   - Return <Chip size="small" label={...} color={...} />.
-  // Rename `_props` to `{ status }` once you use it.
-  // Tip: `Chip`'s `color` prop type is 'default' | 'primary' | 'secondary' | 'success' |
-  //      'error' | 'info' | 'warning'. TS will narrow your switch for you.
-  void Chip;
-  throw new Error('Not implemented');
+export function BookStatusBadge({ status }: BookStatusBadgeProps): JSX.Element {
+  const color: ChipProps['color'] = statusColor(status);
+  return <Chip size="small" label={statusLabel(status)} color={color} />;
+}
+
+function statusColor(status: BookStatus): ChipProps['color'] {
+  switch (status) {
+    case 'read':
+      return 'success';
+    case 'reading':
+      return 'primary';
+    case 'want_to_read':
+      return 'default';
+  }
 }
