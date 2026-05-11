@@ -8,6 +8,7 @@ The path from "I can read TypeScript" to "I can ship a feature in sample-web". E
 | 1 | **TypeScript fundamentals** | `Book` types, `formatBook`, `filterBooks` | Unit tests green |
 | 2 | **React components + MUI** | `BookCard`, `BookStatusBadge`; rendered list in `App.tsx` | Visible in browser, looks right |
 | 3 | **Zustand stores via `storeRegistry`** | Book editor store with actions, derived selectors | Store tests green |
+| 3b | **Sliced stores** (optional) | Refactor `useBooksStore` into `BookListSlice` + `BookFilterSlice` composed in one store | Same tests still green after refactor |
 | 4 | **API layer + `parseApiError`** | axios `coreApiClient`, mocked backend, `parseApiError` matching sample-web's two error shapes | parseApiError tests green |
 | 5 | **Forms with React Hook Form + Zod** | `BookForm` with Zod validation and backend field-error binding | Submit happy + sad path |
 | 6 | **Entity-grid pattern** | `createScopedStore` + `createEntityDataGridStore` clones, books list with pagination/filter/sort using DataGrid Pro | Grid sorts/filters/paginates |
