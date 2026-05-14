@@ -12,6 +12,7 @@
       "@common/*": ["./src/common/*"],
       "@modules/*": ["./src/modules/*"],
       "@books/*": ["./src/modules/books/*"],
+      "@products/*": ["./src/modules/products/*"],
       "@api/*": ["./src/api/*"],
       "@routes/*": ["./src/routes/*"],
       "@translation/*": ["./src/translation/*"]

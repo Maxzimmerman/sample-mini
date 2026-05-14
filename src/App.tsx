@@ -1,8 +1,20 @@
-import { Box, Container, Stack, Typography } from '@mui/material';
-import { SAMPLE_BOOKS } from '@books/types';
+import { useEffect } from 'react';
+import { Box, CircularProgress, Container, Stack, Typography } from '@mui/material';
+
 import BookCard from '@books/components/BookCard';
+import { SAMPLE_BOOKS } from '@books/types';
+import Products from '@products/components/Products';
+import { useProductStore } from '@products/store/useProductStore';
 
 export function App() {
+  const products = useProductStore((s) => s.products);
+  const loading = useProductStore((s) => s.loading);
+  const fetchProducts = useProductStore((s) => s.fetchProducts);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
       <Stack spacing={3}>
@@ -37,11 +49,18 @@ export function App() {
         </Box>
       </Stack>
 
-      <Stack spacing={2}>                                                                                                                                                                                     
-        {SAMPLE_BOOKS.map((book) => (                                                                                                                                                                       
+      <Stack spacing={2} sx={{ mt: 4 }}>
+        {SAMPLE_BOOKS.map((book) => (
           <BookCard key={book.id} book={book} />
-        ))}                                                                                                                                                                                                   
+        ))}
       </Stack>
+
+      <Box sx={{ mt: 6 }}>
+        <Typography variant="h4" component="h2" gutterBottom>
+          Products
+        </Typography>
+        {loading ? <CircularProgress /> : <Products products={products} />}
+      </Box>
     </Container>
   );
 }
