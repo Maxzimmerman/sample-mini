@@ -5,15 +5,23 @@ import BookCard from '@books/components/BookCard';
 import { SAMPLE_BOOKS } from '@books/types';
 import Products from '@products/components/Products';
 import { useProductStore } from '@products/store/useProductStore';
+import { Humans }  from '../src/modules/humans/components/Human';
+import { useHumanStore } from '../src/modules/humans/stores/useHumanStore';
 
 export function App() {
   const products = useProductStore((s) => s.products);
   const loading = useProductStore((s) => s.loading);
   const fetchProducts = useProductStore((s) => s.fetchProducts);
+  const humans = useHumanStore((s) => s.humans);
+  const getAll = useHumanStore((s) => s.getAll);
 
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
+
+  useEffect(() => {
+    getAll()
+  }, [getAll()]);
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
@@ -61,6 +69,7 @@ export function App() {
         </Typography>
         {loading ? <CircularProgress /> : <Products products={products} />}
       </Box>
+    <Humans humans={ humans }></Humans>
     </Container>
   );
 }
