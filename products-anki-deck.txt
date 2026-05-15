@@ -1,0 +1,69 @@
+#separator:tab
+#html:false
+What is `interface Foo { x: number }`?	A compile-time shape declaration. Says "anything claiming to be Foo must be an object with field x of type number." No runtime existence — erased after type-check.
+`interface` vs `type` for object shapes?	Largely interchangeable. `interface` can be re-opened (declaration merging); `type` cannot. Convention here: use `interface` for slice/component prop shapes.
+What does `type A = B & C` mean?	Intersection. A has ALL fields of B PLUS ALL fields of C. Like merging two struct typespecs in Elixir.
+What does `import type { X } from '...'` do?	Pulls X in for type-checking only. The line is erased at runtime (zero JS output). Use for anything you only reference in type positions.
+What does `import { X, type Y } from '...'` do?	Mixed import: X is a runtime value, Y is a type-only entry. Equivalent to two separate imports.
+What is `Product[]`?	TypeScript syntax for "array of Product". Equivalent to `Array<Product>`.
+What is `Promise<void>`?	A Promise that resolves to nothing meaningful. Like Elixir's `Task.t()` returning `:ok`.
+What does `<T>` after a function name mean?	A type parameter. The function is generic over T. Caller (or inference) fills it in. Example: `create<ProductStore>(...)` binds T to ProductStore.
+How do you write a function TYPE in TS?	`(arg: Type) => ReturnType`. Example: `(p: Product) => void`, `() => Promise<void>`.
+What's the difference between `() => {}` and `() => ({})`?	`{}` is a block body (empty). `({})` returns an empty object literal. Wrap object returns in parens so the parser sees an expression, not a block.
+What is an object literal `{ a: 1, b: 2 }`?	A map / record. Commas separate entries (key:value pairs). NOT a list — order isn't semantically significant.
+What does property shorthand `{ products }` mean?	`{ products: products }`. Bare name = field whose name AND value are both `products`. Comes up constantly.
+What does object spread `{ ...slice, reset: foo }` do?	Copies every entry of `slice` into a new object, then adds `reset`. Later keys overwrite earlier ones. Like `Map.merge(slice, %{reset: foo})`.
+What does array spread `[...arr, x]` do?	Creates a new array with all elements of arr followed by x. Like Elixir `arr ++ [x]`.
+What is rest syntax `(set, get, ...rest) => ...`?	Function parameter syntax: extra arguments beyond the named ones are collected into an array called `rest`.
+What does `async` on a function do?	Wraps the return value in a Promise. Lets you use `await` inside. `async () => 5` returns `Promise<number>`, not `number`.
+What does `await someP` do?	Pauses the async function until the Promise resolves; yields the resolved value. Errors become thrown exceptions.
+What is Zustand in one sentence?	A tiny state library. A store holds one state map; components subscribe via a hook; actions mutate state by calling `set`.
+What does `create(initializer)` from zustand return?	A React hook bound to a state map. Calling the hook reads (and subscribes to) state.
+What is the `set` function passed to a zustand initializer?	A function that updates state. `set(partial)` shallow-merges partial into state; subscribers whose selected slice changed get re-rendered.
+Two ways to call `set` in zustand?	`set({ loading: true })` (partial map) OR `set((state) => ({ products: [...state.products, p] }))` (function that receives current state, returns partial).
+What is `get` in a zustand initializer?	Synchronously reads current state. `get().products` returns the live array. Used inside actions when you need to read before writing.
+What is a selector in zustand?	A function passed to the hook: `useStore((s) => s.products)`. Tells zustand which slice of state to read; component re-renders only when that slice's value changes (by ===).
+Why select narrow slices?	Each different selector return value triggers a re-render. Reading the whole state re-renders on every change; reading one field re-renders only when that field changes.
+What is `StateCreator<Full, Mutators, MutatorsOut, Slice>`?	Zustand's TYPE for an initializer. Slot 1: the full store type. Slots 2&3: middleware lists (usually `[]`). Slot 4: the slice's contribution.
+Why is a slice a function returning a function (`() => (set) => ({...})`)?	Outer = factory you can parameterize (e.g. initial data). Inner = the actual StateCreator zustand consumes. Two layers gives uniform shape across all slices.
+How do you combine multiple slices into one store?	Spread each slice's result into the store's map: `{ ...createA()(set,get,...rest), ...createB()(set,get,...rest), reset }`.
+Why does our project import `create` from `@src/storeRegistry` instead of zustand directly?	Custom wrapper that records each store's initial state on construction. `resetAllStores()` can then wipe every store on logout.
+What does the hook do when you call `useProductStore((s) => s.products)`?	Returns the current `products` array AND subscribes the calling component to it. Re-renders when the value changes (===).
+Can you write `useProductStore.products` to read state?	No. The hook is a function, not an object holding state. Inside a component use `useProductStore((s) => s.products)`. Outside React (rare) use `useProductStore.getState().products`.
+Why must React hooks (useState, useEffect, the zustand hook) live inside a component body?	React tracks them by call-order on each render. Calling them at module top-level or inside conditionals breaks that ordering and crashes.
+What does `useEffect(fn, deps)` do?	Runs `fn` after the render commits to the DOM; re-runs whenever any dep changes (===). `[]` = run once on mount. No array = run after every render.
+Why is `useEffect(() => { fetchProducts() }, [fetchProducts])` safe?	Zustand actions have stable identities — `fetchProducts` is the same function reference across renders. So the effect runs once.
+What re-renders a React component?	A prop changed, OR a hook the component calls returned a different value (e.g. selector return changed).
+What is JSX `<Card key={x}>...</Card>`?	Sugar for `React.createElement(Card, { key: x }, ...)`. JSX is data describing what to render — not an instance.
+Why does a `.map` over a list need `key={id}`?	React uses keys to match items between renders so it can move/update DOM efficiently. Without stable keys, you get warnings and buggy reconciliation.
+File structure of the products module — list directories and files.	`src/modules/products/{types.ts, slices/productActionSlice.ts, store/useProductStore.ts, components/Products.tsx}`
+What goes in `products/types.ts`?	`ProductStatus` literal union, `Product` interface, and (optionally) `SAMPLE_PRODUCTS` seed array.
+Write a `Product` interface with id, title, and status.	`export interface Product { id: string; title: string; status: ProductStatus }`
+Write a `ProductStatus` literal union for "bought | liked | disliked | not_seen".	`export type ProductStatus = 'bought' | 'liked' | 'disliked' | 'not_seen'`
+What fields does `ProductActionSlice` need for fetch+add?	`products: Product[]; loading: boolean; fetchProducts: () => Promise<void>; addProduct: (p: Product) => void`
+Write a `mockFetchProducts` that delays 300ms then returns SAMPLE_PRODUCTS.	`const mockFetchProducts = async (): Promise<Product[]> => { await new Promise(r => setTimeout(r, 300)); return SAMPLE_PRODUCTS; }`
+Write the outer signature of `createProductActionSlice` with no args.	`export const createProductActionSlice = (): StateCreator<ProductActionSlice, [], [], ProductActionSlice> => (set) => ({ ... })`
+Write the body of `fetchProducts` (3 lines).	`set({ loading: true }); const products = await mockFetchProducts(); set({ products, loading: false });`
+Write the body of `addProduct` using `set` with a function.	`set((state) => ({ products: [...state.products, product] }))`
+What is the full `ProductStore` type when a slice + reset are composed?	`export type ProductStore = ProductActionSlice & { reset: () => void }`
+Write `useProductStore` composing the slice plus a reset.	`export const useProductStore = create<ProductStore>((set, get, ...rest) => ({ ...createProductActionSlice()(set, get, ...rest), reset: () => set({ products: [], loading: false }) }))`
+Why call `createProductActionSlice()(set, get, ...rest)` (two parentheses)?	First `()` = invoke the factory, returns the StateCreator. Second `(set, get, ...rest)` = invoke the StateCreator, returns the slice's initial map. Then we spread that map.
+Write `ProductsProps` and the function signature for the `Products` component.	`interface ProductsProps { products: Product[] } export function Products({ products }: ProductsProps): JSX.Element { ... }`
+In App.tsx, how do you subscribe to products and loading from the store?	`const products = useProductStore((s) => s.products); const loading = useProductStore((s) => s.loading);`
+In App.tsx, how do you fetch on mount?	`const fetchProducts = useProductStore((s) => s.fetchProducts); useEffect(() => { fetchProducts(); }, [fetchProducts]);`
+Why does `App.tsx` use TWO `useProductStore(...)` calls instead of one destructure?	Each selector returns one value; React tracks each subscription independently. Destructuring `useProductStore((s) => ({a, b}))` returns a new object every render → infinite re-renders unless you use a shallow equality option.
+Zustand store ≈ Elixir analogue?	GenServer holding a single state map. Selectors ≈ subscriptions. Actions ≈ casts that update state. The actions just happen to live inside the state map itself.
+Slice ≈ Elixir analogue?	A partial typespec + a builder function for one portion of the larger struct. Compose multiple slices with `&` (intersection) and `...` (spread).
+`set({ loading: true })` ≈ Elixir analogue?	`Map.merge(state, %{loading: true})` followed by notifying subscribers.
+`[...arr, x]` ≈ Elixir analogue?	`arr ++ [x]`.
+`{ ...slice, reset: foo }` ≈ Elixir analogue?	`Map.merge(slice, %{reset: foo})`.
+Why is `useEffect` at module top-level (outside the component) broken?	Hooks must be called during a component's render. Module-level code runs once at import time, with no React render context — it crashes immediately.
+Why is `useProductStore.products` (without calling the hook) wrong?	`useProductStore` is a function; it has no `.products` property. State only exists once you CALL the hook (with a selector) inside a component, or via `getState()` outside React.
+What happens if a slice's file path on disk doesn't match the import path?	Bundler (Vite/TS) fails to resolve the module. Either rename the file to match the import, or fix the import to match the file. Imports are path-based, not name-based.
+What does the path alias `@products/*` map to in tsconfig?	`./src/modules/products/*`. Lets you write `import { ... } from '@products/types'` instead of long relative paths.
+Where are path aliases defined and how does Vite pick them up?	Defined in `tsconfig.app.json` under `compilerOptions.paths`. Vite reads them via the `vite-tsconfig-paths` plugin in `vite.config.ts` — one source of truth.
+Steps to add a new slice action that mutates an existing field (e.g. `markBought(id)`).	1) Add the field type to the slice interface. 2) Implement it in the slice factory using `set((s) => ({...}))` or `set` partial. 3) No store changes needed if the slice is already composed. 4) Call via `useStore((s) => s.markBought)` in the component.
+What's the difference between named and default export, in our component files?	Both. `export function Products(...)` is a named export. `export default Products` re-exports the same value as the default. Lets callers use `import Products from '...'` or `import { Products } from '...'`.
+Why initialize the slice's `products` field as `[]` instead of `SAMPLE_PRODUCTS`?	To model the real production shape: data starts empty, the component triggers `fetchProducts` via `useEffect`, the async action fills it. Direct seeding skips the part you actually need to practice.
+What does the store ALSO get by being registered through `@src/storeRegistry`?	A central reset capability. `resetAllStores()` (called on logout) restores every registered store to its initial state — wiping user data without each store knowing about logout.
+Cold-start data flow when App mounts: 7 steps.	1) Module load runs `create(...)`. 2) Zustand calls the initializer with set/get/...rest. 3) Initializer calls `createProductActionSlice()` then invokes it with set/get/...rest. 4) Resulting map is stored as initial state. 5) Hook returned. 6) App renders, subscribes via selectors, fires useEffect. 7) `fetchProducts` runs, `set` updates state, subscribers re-render.
