@@ -7,6 +7,7 @@ import Products from '@products/components/Products';
 import { useProductStore } from '@products/store/useProductStore';
 import { Humans }  from '../src/modules/humans/components/Human';
 import { useHumanStore } from '../src/modules/humans/stores/useHumanStore';
+import Animals from '../src/modules/animala/components/Animal';
 
 export function App() {
   const products = useProductStore((s) => s.products);
@@ -70,6 +71,7 @@ export function App() {
         {loading ? <CircularProgress /> : <Products products={products} />}
       </Box>
     <Humans humans={ humans }></Humans>
+    <Animals></Animals>
     </Container>
   );
 }
