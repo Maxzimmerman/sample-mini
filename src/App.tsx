@@ -8,6 +8,7 @@ import { useProductStore } from '@products/store/useProductStore';
 import { Humans }  from '../src/modules/humans/components/Human';
 import { useHumanStore } from '../src/modules/humans/stores/useHumanStore';
 import Animals from '../src/modules/animala/components/Animal';
+import { Store } from '../src/modules/gn/stores/useGnStore';
 
 export function App() {
   const products = useProductStore((s) => s.products);
@@ -15,6 +16,8 @@ export function App() {
   const fetchProducts = useProductStore((s) => s.fetchProducts);
   const humans = useHumanStore((s) => s.humans);
   const getAll = useHumanStore((s) => s.getAll);
+  const animals2 = Store((store) => store.animals);
+  const getAll2 = Store((store) => store.getAll);
 
   useEffect(() => {
     fetchProducts();
@@ -23,6 +26,12 @@ export function App() {
   useEffect(() => {
     getAll()
   }, [getAll()]);
+
+  useEffect(() => {
+    getAll2()
+  }, [getAll2]);
+
+  console.log(animals2);
 
   return (
     <Container maxWidth="md" sx={{ py: 6 }}>
